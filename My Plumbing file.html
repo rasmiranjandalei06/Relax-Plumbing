@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramesh Chandra Dalei – Plumbing Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --blue: #1e6fbf;
+    --blue-light: #2d8aeb;
+    --cyan: #00b4d8;
+    --orange: #f4821f;
+    --green: #2ea043;
+    --red: #da3633;
+    --yellow: #e3b341;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #484f58;
+    --radius: 10px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #0a1628 0%, #0d2040 50%, #091825 100%);
+    border-bottom: 2px solid var(--blue);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(30,111,191,0.3);
+  }
+  .logo-icon {
+    width: 48px; height: 48px;
+    background: var(--blue);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .brand h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px; font-weight: 700;
+    color: #fff; letter-spacing: 1px;
+  }
+  .brand p { font-size: 12px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; }
+  header nav { margin-left: auto; display: flex; gap: 8px; }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Noto Sans', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── PAGE TITLE ── */
+  .page-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 26px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+  .page-title span { color: var(--cyan); }
+
+  /* ── OWNER CARDS ── */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .owner-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .owner-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--blue);
+  }
+  .owner-card:hover { border-color: var(--blue-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .owner-card-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .owner-card-place { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+  .owner-card-stats {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .stat-box {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+  }
+  .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .stat-value { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; }
+  .stat-value.pending { color: var(--red); }
+  .stat-value.days { color: var(--cyan); }
+  .worker-pending-list { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+  .worker-pending-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .worker-name-tag { color: var(--text); }
+  .worker-amount-tag { color: var(--orange); font-weight: 600; }
+  .notification-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    margin-left: 6px;
+  }
+
+  /* ── ADD OWNER BTN ── */
+  .add-btn {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: 11px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: 'Noto Sans', sans-serif;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
+    margin-bottom: 20px;
+  }
+  .add-btn:hover { background: var(--blue-light); }
+
+  /* ── MODAL ── */
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    width: 100%; max-width: 620px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow);
+  }
+  .modal h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px; font-weight: 700;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+    color: #fff;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: 'Noto Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue); }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .form-group select option { background: var(--surface2); }
+
+  /* Worker entries in form */
+  .workers-section { margin-bottom: 14px; }
+  .workers-section-title {
+    font-size: 13px; color: var(--cyan);
+    font-weight: 600; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .worker-entry {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .worker-entry .remove-worker {
+    position: absolute; top: 10px; right: 10px;
+    background: none; border: none; color: var(--red);
+    cursor: pointer; font-size: 16px;
+  }
+  .add-worker-btn {
+    background: transparent;
+    border: 1px dashed var(--cyan);
+    color: var(--cyan);
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Noto Sans', sans-serif;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .add-worker-btn:hover { background: rgba(0,180,216,0.1); }
+
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+  .btn-cancel {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); padding: 9px 20px;
+    border-radius: 8px; cursor: pointer;
+    font-family: 'Noto Sans', sans-serif; font-size: 14px;
+  }
+  .btn-save {
+    background: var(--green); border: none; color: #fff;
+    padding: 9px 24px; border-radius: 8px; cursor: pointer;
+    font-family: 'Noto Sans', sans-serif; font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-save:hover { opacity: 0.88; }
+
+  /* ── OWNER FILE VIEW ── */
+  .back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 7px 14px;
+    border-radius: 8px; cursor: pointer;
+    font-size: 13px;
+    font-family: 'Noto Sans', sans-serif;
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { border-color: var(--blue); color: #fff; }
+
+  .file-header {
+    background: linear-gradient(135deg, var(--surface) 0%, #1a2640 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    margin-bottom: 20px;
+    border-left: 4px solid var(--blue);
+  }
+  .file-owner-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px; font-weight: 700; margin-bottom: 4px;
+  }
+  .file-owner-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .file-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+  .file-stat {
+    background: var(--surface2);
+    border-radius: 8px; padding: 12px 18px;
+    min-width: 130px; text-align: center;
+  }
+  .file-stat-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px; }
+  .file-stat-value { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; }
+
+  .section-heading {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px; font-weight: 600;
+    margin: 24px 0 12px;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--cyan);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .entry-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .entry-date {
+    font-size: 12px; color: var(--text-muted);
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .entry-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px; margin-bottom: 10px;
+  }
+  .entry-field { }
+  .entry-field-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .entry-field-value { font-size: 14px; color: var(--text); margin-top: 2px; }
+  .badge {
+    display: inline-block; padding: 2px 10px;
+    border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  .badge-green { background: rgba(46,160,67,0.2); color: var(--green); }
+  .badge-red { background: rgba(218,54,51,0.2); color: var(--red); }
+  .badge-yellow { background: rgba(227,179,65,0.2); color: var(--yellow); }
+  .badge-orange { background: rgba(244,130,31,0.2); color: var(--orange); }
+
+  .workers-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+  .workers-table th {
+    background: var(--surface2);
+    color: var(--text-muted); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 8px 12px; text-align: left;
+  }
+  .workers-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .workers-table tr:last-child td { border-bottom: none; }
+
+  /* ── FAB EDIT ── */
+  .fab {
+    position: fixed; bottom: 28px; right: 28px;
+    width: 54px; height: 54px;
+    background: var(--orange);
+    border-radius: 50%; border: none;
+    color: #fff; font-size: 22px;
+    cursor: pointer; display: none;
+    align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(244,130,31,0.5);
+    z-index: 150; transition: transform 0.2s;
+  }
+  .fab:hover { transform: scale(1.1); }
+  .fab.visible { display: flex; }
+
+  /* ── PENDING PAGE ── */
+  .pending-list-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .pending-list-header {
+    background: var(--surface2);
+    padding: 12px 18px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px; font-weight: 600;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .pending-list-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+    transition: background 0.15s;
+  }
+  .pending-list-row:hover { background: var(--surface2); }
+  .pending-list-name { display: flex; align-items: center; gap: 8px; }
+  .pending-list-amount { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; }
+  .pending-list-amount.owner { color: var(--red); }
+  .pending-list-amount.worker { color: var(--orange); }
+
+  .empty-state {
+    text-align: center; padding: 60px 20px;
+    color: var(--text-muted);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; }
+
+  /* ── UTILITY ── */
+  .text-right { text-align: right; }
+  .mt-8 { margin-top: 8px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--surface2); border-radius: 20px;
+    padding: 3px 10px; font-size: 12px; color: var(--text-muted);
+    margin-right: 6px; margin-bottom: 4px;
+  }
+
+  @media(max-width: 600px) {
+    .form-row { grid-template-columns: 1fr; }
+    header { padding: 12px 16px; }
+    .brand h1 { font-size: 17px; }
+    .page { padding: 16px; }
+    .file-stats { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">🔧</div>
+  <div class="brand">
+    <h1>Ramesh Chandra Dalei</h1>
+    <p>Plumbing Works Manager</p>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('home')" id="nav-home">🏠 Home</button>
+    <button class="nav-btn" onclick="showPage('pending-owners')" id="nav-pending-owners">💰 Pending Payment</button>
+    <button class="nav-btn" onclick="showPage('pending-workers')" id="nav-pending-workers">👷 Workers Payment</button>
+  </nav>
+</header>
+
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <div class="page-title">📁 <span>Owner Files</span></div>
+  <button class="add-btn" onclick="openAddOwnerModal()">➕ Add New Owner File</button>
+  <div class="cards-grid" id="owner-cards"></div>
+</div>
+
+<!-- OWNER FILE DETAIL PAGE -->
+<div class="page" id="page-owner-file">
+  <button class="back-btn" onclick="showPage('home')">← Back to Files</button>
+  <div id="owner-file-content"></div>
+</div>
+
+<!-- PENDING OWNERS PAGE -->
+<div class="page" id="page-pending-owners">
+  <div class="page-title">💰 <span>Pending Payment</span> <span style="font-size:14px;color:var(--text-muted);font-family:'Noto Sans'"> from Owners</span></div>
+  <div id="pending-owners-list"></div>
+</div>
+
+<!-- PENDING WORKERS PAGE -->
+<div class="page" id="page-pending-workers">
+  <div class="page-title">👷 <span>Pending Workers Payment</span></div>
+  <div id="pending-workers-list"></div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab-edit" onclick="openEditModal()" title="Edit this file">✏️</button>
+
+<!-- ADD/EDIT OWNER MODAL -->
+<div class="modal-backdrop" id="modal-owner">
+  <div class="modal">
+    <h2 id="modal-title">📋 New Owner File</h2>
+    <div class="form-row">
+      <div class="form-group">
+        <label>📅 Date of Working</label>
+        <input type="date" id="f-date">
+      </div>
+      <div class="form-group">
+        <label>📍 Place of Working</label>
+        <input type="text" id="f-place" placeholder="e.g. 2nd Floor, MG Road">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>👤 Owner Name</label>
+        <input type="text" id="f-owner-name" placeholder="e.g. Rajesh">
+      </div>
+      <div class="form-group">
+        <label>📞 Owner Phone</label>
+        <input type="tel" id="f-owner-phone" placeholder="98xxxxxxxx">
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label>🔩 Work Description</label>
+        <textarea id="f-work" placeholder="Describe the work done..."></textarea>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>💵 Total Amount (₹)</label>
+        <input type="number" id="f-total" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>✅ Payment Status</label>
+        <select id="f-payment-status" onchange="togglePending()">
+          <option value="cleared">Cleared</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" id="pending-amount-row" style="display:none">
+      <div class="form-group">
+        <label>⏳ Pending Amount (₹)</label>
+        <input type="number" id="f-pending" placeholder="0">
+      </div>
+    </div>
+
+    <!-- Workers Section -->
+    <div class="workers-section">
+      <div class="workers-section-title">👷 Workers</div>
+      <div id="workers-form-list"></div>
+      <button class="add-worker-btn" onclick="addWorkerField()">➕ Add Another Worker</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveEntry()">💾 Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA LAYER ───────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'rcd_plumbing_v2';
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { owners: [] };
+  } catch { return { owners: [] }; }
+}
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+let data = loadData();
+let currentOwnerId = null;
+let editingEntryId = null;
+let editingOwnerMode = false; // true = editing existing owner entry
+
+// ─── PAGE ROUTING ────────────────────────────────────────────────────────────
+function showPage(page, ownerId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('fab-edit').classList.remove('visible');
+
+  if (page === 'home') {
+    document.getElementById('page-home').classList.add('active');
+    document.getElementById('nav-home').classList.add('active');
+    renderOwnerCards();
+  } else if (page === 'owner-file') {
+    currentOwnerId = ownerId;
+    document.getElementById('page-owner-file').classList.add('active');
+    document.getElementById('fab-edit').classList.add('visible');
+    renderOwnerFile(ownerId);
+  } else if (page === 'pending-owners') {
+    document.getElementById('page-pending-owners').classList.add('active');
+    document.getElementById('nav-pending-owners').classList.add('active');
+    renderPendingOwners();
+  } else if (page === 'pending-workers') {
+    document.getElementById('page-pending-workers').classList.add('active');
+    document.getElementById('nav-pending-workers').classList.add('active');
+    renderPendingWorkers();
+  }
+}
+
+// ─── OWNER CARDS ────────────────────────────────────────────────────────────
+function renderOwnerCards() {
+  const container = document.getElementById('owner-cards');
+  if (!data.owners.length) {
+    container.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">📂</div><p>No owner files yet. Add your first one!</p></div>`;
+    return;
+  }
+  container.innerHTML = data.owners.map(owner => {
+    const totalDays = owner.entries.reduce((s, e) => s + (parseInt(e.days) || 1), 0);
+    const pendingOwner = owner.entries.reduce((s, e) => s + (e.paymentStatus === 'pending' ? (parseFloat(e.pendingAmount) || 0) : 0), 0);
+    const workerPending = getWorkerPendingForOwner(owner);
+
+    let workerRows = '';
+    if (workerPending.length) {
+      workerRows = `<div class="worker-pending-list">
+        <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">👷 Worker Pending</div>
+        ${workerPending.map(w => `
+          <div class="worker-pending-row">
+            <span class="worker-name-tag">${w.name}</span>
+            <span class="worker-amount-tag">₹${w.amount.toLocaleString('en-IN')}</span>
+          </div>`).join('')}
+      </div>`;
+    }
+
+    return `<div class="owner-card" onclick="showPage('owner-file','${owner.id}')">
+      <div class="owner-card-name">${owner.name} ${workerPending.length > 1 ? '<span class="notification-dot"></span>' : ''}</div>
+      <div class="owner-card-place">📍 ${owner.place || '—'} &nbsp;|&nbsp; 📞 ${owner.phone || '—'}</div>
+      <div class="owner-card-stats">
+        <div class="stat-box">
+          <div class="stat-label">📅 Days</div>
+          <div class="stat-value days">${totalDays}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">💰 Owner Pending</div>
+          <div class="stat-value pending">₹${pendingOwner.toLocaleString('en-IN')}</div>
+        </div>
+      </div>
+      ${workerRows}
+    </div>`;
+  }).join('');
+}
+
+function getWorkerPendingForOwner(owner) {
+  const map = {};
+  owner.entries.forEach(e => {
+    (e.workers || []).forEach(w => {
+      if (w.paymentDone === 'no' && w.name) {
+        if (!map[w.name]) map[w.name] = { name: w.name, phone: w.phone, amount: 0 };
+        map[w.name].amount += parseFloat(w.payment) || 0;
+      }
+    });
+  });
+  return Object.values(map);
+}
+
+// ─── OWNER FILE VIEW ────────────────────────────────────────────────────────
+function renderOwnerFile(ownerId) {
+  const owner = data.owners.find(o => o.id === ownerId);
+  if (!owner) return;
+
+  const totalDays = owner.entries.reduce((s, e) => s + (parseInt(e.days) || 1), 0);
+  const pendingOwner = owner.entries.reduce((s, e) => s + (e.paymentStatus === 'pending' ? (parseFloat(e.pendingAmount) || 0) : 0), 0);
+  const totalAmount = owner.entries.reduce((s, e) => s + (parseFloat(e.totalAmount) || 0), 0);
+  const workerPending = getWorkerPendingForOwner(owner);
+  const totalWorkerPay = owner.entries.reduce((s, e) => s + (e.workers || []).reduce((ws, w) => ws + (parseFloat(w.payment) || 0), 0), 0);
+
+  let workerPendingHTML = '';
+  if (workerPending.length) {
+    workerPendingHTML = `<table class="workers-table">
+      <tr><th>Worker Name</th><th>Phone</th><th>Pending Amount</th></tr>
+      ${workerPending.map(w => `<tr>
+        <td>👷 ${w.name}</td>
+        <td>${w.phone || '—'}</td>
+        <td><span class="badge badge-orange">₹${w.amount.toLocaleString('en-IN')}</span></td>
+      </tr>`).join('')}
+    </table>`;
+  } else {
+    workerPendingHTML = `<p style="color:var(--green);font-size:13px">✅ All worker payments cleared</p>`;
+  }
+
+  const entriesHTML = owner.entries.length ? owner.entries.map((e, idx) => {
+    const workersHTML = e.workers && e.workers.length
+      ? `<div style="margin-top:10px">
+          <div class="entry-field-label">👷 Workers</div>
+          <table class="workers-table" style="margin-top:4px">
+            <tr><th>Name</th><th>Phone</th><th>Payment</th><th>Status</th></tr>
+            ${e.workers.map(w => `<tr>
+              <td>${w.name}</td><td>${w.phone || '—'}</td>
+              <td>₹${parseFloat(w.payment||0).toLocaleString('en-IN')}</td>
+              <td><span class="badge ${w.paymentDone==='yes'?'badge-green':'badge-orange'}">${w.paymentDone==='yes'?'✅ Done':'⏳ Pending'}</span></td>
+            </tr>`).join('')}
+          </table>
+        </div>` : '';
+
+    return `<div class="entry-card">
+      <div class="entry-date">📅 ${e.date || '—'} &nbsp;|&nbsp; Entry #${idx + 1}</div>
+      <div class="entry-grid">
+        <div class="entry-field"><div class="entry-field-label">🔩 Work</div><div class="entry-field-value">${e.work || '—'}</div></div>
+        <div class="entry-field"><div class="entry-field-label">📆 Days</div><div class="entry-field-value">${e.days || 1}</div></div>
+        <div class="entry-field"><div class="entry-field-label">💵 Total Amount</div><div class="entry-field-value">₹${parseFloat(e.totalAmount||0).toLocaleString('en-IN')}</div></div>
+        <div class="entry-field"><div class="entry-field-label">💰 Payment Status</div><div class="entry-field-value">
+          ${e.paymentStatus === 'cleared'
+            ? '<span class="badge badge-green">✅ Cleared</span>'
+            : `<span class="badge badge-red">⏳ Pending ₹${parseFloat(e.pendingAmount||0).toLocaleString('en-IN')}</span>`}
+        </div></div>
+      </div>
+      ${workersHTML}
+    </div>`;
+  }).join('') : `<p style="color:var(--text-muted);font-size:14px">No entries yet.</p>`;
+
+  document.getElementById('owner-file-content').innerHTML = `
+    <div class="file-header">
+      <div class="file-owner-name">👤 ${owner.name}</div>
+      <div class="file-owner-sub">📍 ${owner.place || '—'} &nbsp;|&nbsp; 📞 ${owner.phone || '—'}</div>
+      <div class="file-stats">
+        <div class="file-stat">
+          <div class="file-stat-label">📅 Total Days</div>
+          <div class="file-stat-value" style="color:var(--cyan)">${totalDays}</div>
+        </div>
+        <div class="file-stat">
+          <div class="file-stat-label">💵 Total Amount</div>
+          <div class="file-stat-value" style="color:var(--text)">₹${totalAmount.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="file-stat">
+          <div class="file-stat-label">💰 Owner Pending</div>
+          <div class="file-stat-value" style="color:var(--red)">₹${pendingOwner.toLocaleString('en-IN')}</div>
+        </div>
+        <div class="file-stat">
+          <div class="file-stat-label">👷 Total Worker Pay</div>
+          <div class="file-stat-value" style="color:var(--orange)">₹${totalWorkerPay.toLocaleString('en-IN')}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-heading">💰 Workers Pending Payment</div>
+    ${workerPendingHTML}
+
+    <div class="section-heading">📋 All Entries</div>
+    ${entriesHTML}
+
+    <div style="margin-top:16px">
+      <button class="add-btn" onclick="openAddEntryModal('${owner.id}')">➕ Add New Entry to this File</button>
+    </div>
+  `;
+}
+
+// ─── PENDING PAGES ───────────────────────────────────────────────────────────
+function renderPendingOwners() {
+  const container = document.getElementById('pending-owners-list');
+  const rows = data.owners.map(owner => {
+    const pending = owner.entries.reduce((s, e) => s + (e.paymentStatus === 'pending' ? (parseFloat(e.pendingAmount) || 0) : 0), 0);
+    return { owner, pending };
+  }).filter(r => r.pending > 0);
+
+  if (!rows.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div><p>No pending payments from any owner!</p></div>`;
+    return;
+  }
+
+  const lastUpdated = o => {
+    const dates = o.entries.map(e => e.date).filter(Boolean).sort();
+    return dates.length ? dates[dates.length - 1] : '—';
+  };
+
+  container.innerHTML = `<div class="pending-list-card">
+    <div class="pending-list-header">
+      <span>💰 Owner</span><span>Pending Amount</span>
+    </div>
+    ${rows.map(r => `
+      <div class="pending-list-row" onclick="showPage('owner-file','${r.owner.id}')" style="cursor:pointer">
+        <div class="pending-list-name">
+          <span style="font-size:20px">👤</span>
+          <div>
+            <div style="font-weight:600">${r.owner.name}</div>
+            <div style="font-size:12px;color:var(--text-muted)">📍 ${r.owner.place || '—'} &nbsp;|&nbsp; 🕐 Last: ${lastUpdated(r.owner)}</div>
+          </div>
+        </div>
+        <div class="pending-list-amount owner">₹${r.pending.toLocaleString('en-IN')}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function renderPendingWorkers() {
+  const container = document.getElementById('pending-workers-list');
+  const workerMap = {};
+
+  data.owners.forEach(owner => {
+    owner.entries.forEach(e => {
+      (e.workers || []).forEach(w => {
+        if (w.paymentDone === 'no' && w.name) {
+          const key = w.name.toLowerCase().trim();
+          if (!workerMap[key]) workerMap[key] = { name: w.name, phone: w.phone, amount: 0, owners: new Set() };
+          workerMap[key].amount += parseFloat(w.payment) || 0;
+          workerMap[key].owners.add(owner.name);
+        }
+      });
+    });
+  });
+
+  const rows = Object.values(workerMap);
+  if (!rows.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎉</div><p>All worker payments are cleared!</p></div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="pending-list-card">
+    <div class="pending-list-header">
+      <span>👷 Worker</span><span>Pending Amount</span>
+    </div>
+    ${rows.map(r => `
+      <div class="pending-list-row">
+        <div class="pending-list-name">
+          <span style="font-size:20px">👷</span>
+          <div>
+            <div style="font-weight:600">${r.name}</div>
+            <div style="font-size:12px;color:var(--text-muted)">📞 ${r.phone || '—'} &nbsp;|&nbsp; Works for: ${[...r.owners].join(', ')}</div>
+          </div>
+        </div>
+        <div class="pending-list-amount worker">₹${r.amount.toLocaleString('en-IN')}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// ─── MODAL ───────────────────────────────────────────────────────────────────
+let modalOwnerContext = null; // ownerId for adding entry
+
+function openAddOwnerModal() {
+  resetForm();
+  modalOwnerContext = null;
+  editingEntryId = null;
+  editingOwnerMode = false;
+  document.getElementById('modal-title').textContent = '📋 New Owner File';
+  document.getElementById('modal-owner').classList.add('open');
+  addWorkerField();
+}
+
+function openAddEntryModal(ownerId) {
+  resetForm();
+  modalOwnerContext = ownerId;
+  editingEntryId = null;
+  editingOwnerMode = false;
+  const owner = data.owners.find(o => o.id === ownerId);
+  document.getElementById('modal-title').textContent = `➕ New Entry – ${owner.name}`;
+  // Pre-fill owner details but disabled
+  document.getElementById('f-owner-name').value = owner.name;
+  document.getElementById('f-owner-name').disabled = true;
+  document.getElementById('f-owner-phone').value = owner.phone || '';
+  document.getElementById('f-owner-phone').disabled = true;
+  document.getElementById('f-place').value = owner.place || '';
+  document.getElementById('f-place').disabled = true;
+  document.getElementById('modal-owner').classList.add('open');
+  addWorkerField();
+}
+
+function openEditModal() {
+  // Edit last entry of current owner, or allow selection
+  const owner = data.owners.find(o => o.id === currentOwnerId);
+  if (!owner || !owner.entries.length) {
+    alert('No entries to edit. Please add an entry first.');
+    return;
+  }
+  // Edit most recent entry
+  const entry = owner.entries[owner.entries.length - 1];
+  resetForm();
+  editingEntryId = entry.id;
+  modalOwnerContext = currentOwnerId;
+  editingOwnerMode = false;
+  document.getElementById('modal-title').textContent = `✏️ Edit Entry – ${owner.name}`;
+
+  document.getElementById('f-date').value = entry.date || '';
+  document.getElementById('f-place').value = owner.place || '';
+  document.getElementById('f-place').disabled = true;
+  document.getElementById('f-owner-name').value = owner.name;
+  document.getElementById('f-owner-name').disabled = true;
+  document.getElementById('f-owner-phone').value = owner.phone || '';
+  document.getElementById('f-owner-phone').disabled = true;
+  document.getElementById('f-work').value = entry.work || '';
+  document.getElementById('f-total').value = entry.totalAmount || '';
+  document.getElementById('f-payment-status').value = entry.paymentStatus || 'cleared';
+  togglePending();
+  if (entry.paymentStatus === 'pending') document.getElementById('f-pending').value = entry.pendingAmount || '';
+
+  // Add worker fields
+  (entry.workers || []).forEach(w => addWorkerField(w));
+  document.getElementById('modal-owner').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal-owner').classList.remove('open');
+  document.querySelectorAll('[disabled]').forEach(el => el.disabled = false);
+}
+
+function resetForm() {
+  ['f-date','f-place','f-owner-name','f-owner-phone','f-work','f-total','f-pending'].forEach(id => {
+    const el = document.getElementById(id);
+    el.value = '';
+    el.disabled = false;
+  });
+  document.getElementById('f-payment-status').value = 'cleared';
+  document.getElementById('pending-amount-row').style.display = 'none';
+  document.getElementById('workers-form-list').innerHTML = '';
+}
+
+function togglePending() {
+  const val = document.getElementById('f-payment-status').value;
+  document.getElementById('pending-amount-row').style.display = val === 'pending' ? 'grid' : 'none';
+}
+
+let workerCount = 0;
+function addWorkerField(prefill) {
+  workerCount++;
+  const id = workerCount;
+  const div = document.createElement('div');
+  div.className = 'worker-entry';
+  div.id = `worker-entry-${id}`;
+  div.innerHTML = `
+    <button class="remove-worker" onclick="removeWorker(${id})">✕</button>
+    <div class="form-row">
+      <div class="form-group">
+        <label>👷 Worker Name</label>
+        <input type="text" id="w-name-${id}" placeholder="Worker name" value="${prefill ? prefill.name : ''}">
+      </div>
+      <div class="form-group">
+        <label>📞 Worker Phone</label>
+        <input type="tel" id="w-phone-${id}" placeholder="Phone number" value="${prefill ? prefill.phone : ''}">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>💵 Worker Payment (₹)</label>
+        <input type="number" id="w-pay-${id}" placeholder="0" value="${prefill ? prefill.payment : ''}">
+      </div>
+      <div class="form-group">
+        <label>✅ Payment Done?</label>
+        <select id="w-done-${id}">
+          <option value="no" ${prefill && prefill.paymentDone==='no' ? 'selected':''}>⏳ Pending</option>
+          <option value="yes" ${prefill && prefill.paymentDone==='yes' ? 'selected':''}>✅ Done</option>
+        </select>
+      </div>
+    </div>
+  `;
+  document.getElementById('workers-form-list').appendChild(div);
+}
+
+function removeWorker(id) {
+  const el = document.getElementById(`worker-entry-${id}`);
+  if (el) el.remove();
+}
+
+function collectWorkers() {
+  const workers = [];
+  document.querySelectorAll('.worker-entry').forEach(el => {
+    const id = el.id.replace('worker-entry-', '');
+    const name = document.getElementById(`w-name-${id}`)?.value?.trim();
+    if (name) {
+      workers.push({
+        name,
+        phone: document.getElementById(`w-phone-${id}`)?.value?.trim() || '',
+        payment: document.getElementById(`w-pay-${id}`)?.value || '0',
+        paymentDone: document.getElementById(`w-done-${id}`)?.value || 'no',
+      });
+    }
+  });
+  return workers;
+}
+
+function saveEntry() {
+  const ownerName = document.getElementById('f-owner-name').value.trim();
+  if (!ownerName) { alert('Please enter owner name.'); return; }
+
+  const workers = collectWorkers();
+  const entryData = {
+    id: editingEntryId || uid(),
+    date: document.getElementById('f-date').value,
+    work: document.getElementById('f-work').value.trim(),
+    days: 1,
+    totalAmount: document.getElementById('f-total').value,
+    paymentStatus: document.getElementById('f-payment-status').value,
+    pendingAmount: document.getElementById('f-pending').value || '0',
+    workers,
+  };
+
+  if (modalOwnerContext) {
+    // Add/Edit entry in existing owner
+    const owner = data.owners.find(o => o.id === modalOwnerContext);
+    if (editingEntryId) {
+      const idx = owner.entries.findIndex(e => e.id === editingEntryId);
+      if (idx >= 0) owner.entries[idx] = entryData;
+    } else {
+      owner.entries.push(entryData);
+    }
+  } else {
+    // Create new owner with first entry
+    const place = document.getElementById('f-place').value.trim();
+    const newOwner = {
+      id: uid(),
+      name: ownerName,
+      phone: document.getElementById('f-owner-phone').value.trim(),
+      place,
+      entries: [entryData],
+    };
+    data.owners.push(newOwner);
+  }
+
+  saveData(data);
+  closeModal();
+
+  if (modalOwnerContext) {
+    renderOwnerFile(modalOwnerContext);
+  } else {
+    showPage('home');
+  }
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+showPage('home');
+</script>
+</body>
+</html>
